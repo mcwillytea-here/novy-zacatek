@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WILLY TEA - Hip Hop</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            overflow-x: hidden;
+            background: #000;
+            color: #fff;
+        }
+
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 4rem;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 900;
+            letter-spacing: -2px;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+            transition: opacity 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.6;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .slide {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            display: none;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        .slide-bg {
+            position: absolute;
+            top: -10%;
+            left: -10%;
+            width: 120%;
+            height: 120%;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.3s ease-out;
+        }
+
+        .slide:hover .slide-bg {
+            transform: scale(1.05);
+        }
+
+        .slide-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 100%);
+        }
+
+        .slide-content {
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 8rem;
+        }
+
+        .slide-text {
+            max-width: 600px;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .slide-number {
+            font-size: 8rem;
+            font-weight: 900;
+            opacity: 0.15;
+            position: absolute;
+            right: 8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            line-height: 1;
+        }
+
+        .slide-title {
+            font-size: 6rem;
+            font-weight: 900;
+            line-height: 0.9;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            letter-spacing: -3px;
+        }
+
+        .slide-subtitle {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            font-weight: 300;
+            opacity: 0.9;
+            max-width: 450px;
+        }
+
+        .countdown-container {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .countdown-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .countdown {
+			display: flex;
+			gap: 2rem;
+			font-size: 2.5rem;
+			font-weight: 900;
+			justify-content: space-around;
+        }
+
+        .countdown-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .countdown-value {
+            font-size: 3rem;
+            line-height: 1;
+        }
+
+        .countdown-label {
+            font-size: 0.7rem;
+            opacity: 0.6;
+            margin-top: 0.5rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 4rem;
+            left: 8rem;
+            right: 8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-buttons {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0.5rem 2rem;
+            letter-spacing: 2px;
+            font-weight: 300;
+            transition: opacity 0.3s;
+            position: relative;
+        }
+
+        .nav-btn:hover {
+            opacity: 0.6;
+        }
+
+        .progress-bar {
+            height: 2px;
+            background: rgba(255,255,255,0.2);
+            flex: 1;
+            margin: 0 2rem;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #fff;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .watch-btn {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid #fff;
+            color: #fff;
+            padding: 1rem 2rem;
+            cursor: pointer;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            font-weight: 700;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .watch-btn:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        .play-icon {
+            width: 0;
+            height: 0;
+            border-left: 12px solid currentColor;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 2rem;
+            left: 8rem;
+            font-size: 0.9rem;
+            opacity: 0.5;
+            z-index: 100;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fly {
+            0% {
+                transform: translateX(-100px) translateY(0);
+            }
+            100% {
+                transform: translateX(calc(100vw + 100px)) translateY(-50px);
+            }
+        }
+
+        /* Music Page Styles */
+        .music-page {
+            min-height: 100vh;
+            padding: 8rem 4rem 4rem;
+            background: linear-gradient(180deg, #000 0%, #1a1a1a 100%);
+            position: relative;
+        }
+
+        .music-page::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.1;
+            z-index: 0;
+        }
+
+        .music-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .music-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .music-title {
+            font-size: 5rem;
+            font-weight: 900;
+            letter-spacing: -3px;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .music-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.7;
+            font-weight: 300;
+            margin-bottom: 2rem;
+        }
+
+        .view-toggle {
+            display: inline-flex;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50px;
+            padding: 0.3rem;
+            gap: 0.3rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .toggle-btn {
+            padding: 0.8rem 2rem;
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.5);
+            cursor: pointer;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+
+        .toggle-btn.active {
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        .tracks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .track-card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s;
+            animation: fadeInUp 0.8s ease-out;
+            cursor: pointer;
+        }
+
+        .track-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(255,255,255,0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .track-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .track-card:hover .track-image {
+            transform: scale(1.1);
+        }
+
+        .track-image-container {
+            overflow: hidden;
+            position: relative;
+        }
+
+        .track-status {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(0,0,0,0.8);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-released {
+            background: rgba(0,255,0,0.2);
+            border: 1px solid rgba(0,255,0,0.5);
+            color: #0f0;
+        }
+
+        .status-soon {
+            background: rgba(255,255,0,0.2);
+            border: 1px solid rgba(255,255,0,0.5);
+            color: #ff0;
+        }
+
+        .track-info {
+            padding: 2rem;
+        }
+
+        .track-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+        }
+
+        .track-date {
+            font-size: 0.9rem;
+            opacity: 0.6;
+            margin-bottom: 1rem;
+        }
+
+        .track-description {
+            font-size: 1rem;
+            line-height: 1.6;
+            opacity: 0.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .track-links {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .track-link {
+            padding: 0.7rem 1.5rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 25px;
+            text-decoration: none;
+            color: #fff;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .track-link:hover {
+            background: #fff;
+            color: #000;
+            transform: translateY(-2px);
+        }
+
+        .spotify-section {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: rgba(255,255,255,0.03);
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .spotify-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+        }
+
+        .spotify-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            margin-bottom: 2rem;
+        }
+
+        .spotify-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.2rem 3rem;
+            background: #1DB954;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+
+        .spotify-btn:hover {
+            background: #1ed760;
+            transform: scale(1.05);
+            box-shadow: 0 10px 40px rgba(29, 185, 84, 0.4);
+        }
+
+        /* Timeline Styles */
+        .timeline-container {
+            position: relative;
+            padding: 2rem 0;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(255,255,255,0.2);
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 4rem;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-left: 0;
+            margin-right: auto;
+            padding-right: 3rem;
+        }
+
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-left: auto;
+            margin-right: 0;
+            padding-left: 3rem;
+        }
+
+        .timeline-content {
+            width: 45%;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+
+        .timeline-content:hover {
+            transform: scale(1.05);
+            border-color: rgba(255,255,255,0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            top: 2rem;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            box-shadow: 0 0 20px rgba(255,255,255,0.5);
+        }
+
+        .timeline-dot.released {
+            background: #1DB954;
+            box-shadow: 0 0 20px rgba(29, 185, 84, 0.7);
+        }
+
+        .timeline-dot.upcoming {
+            background: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+        }
+
+        .timeline-date {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .timeline-track-name {
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+        }
+
+        .timeline-description {
+            font-size: 1rem;
+            line-height: 1.6;
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
+
+        .timeline-status {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav {
+                padding: 1.5rem 1.5rem;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+            
+            .nav-links {
+                gap: 1.5rem;
+            }
+            
+            .nav-links a {
+                font-size: 0.85rem;
+            }
+            
+            .slide-content {
+                padding: 0 1.5rem;
+                flex-direction: column;
+                justify-content: center;
+            }
+            
+            .slide-title {
+                font-size: 2.5rem;
+                letter-spacing: -2px;
+                margin-bottom: 1.5rem;
+            }
+            
+            .slide-subtitle {
+                font-size: 1rem;
+                line-height: 1.6;
+            }
+            
+            .slide-number {
+                font-size: 3rem;
+                right: 1.5rem;
+                top: auto;
+                bottom: 8rem;
+                transform: none;
+            }
+            
+            .countdown-container {
+                margin-top: 2rem;
+                padding: 1.5rem;
+            }
+            
+            .countdown-title {
+                font-size: 1rem;
+                margin-bottom: 1rem;
+            }
+            
+            .countdown {
+                gap: 1rem;
+                font-size: 1.5rem;
+				display: flex;
+				justify-content: space-evenly;	
+;
+            }
+            
+            .countdown-value {
+                font-size: 2rem;
+						
+            }
+            
+            .countdown-label {
+                font-size: 0.6rem;
+            }
+            
+            .controls {
+                left: 1.5rem;
+                right: 1.5rem;
+                bottom: 1.5rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-buttons {
+                width: 100%;
+            }
+            
+            .progress-bar {
+                margin: 0 1rem;
+            }
+            
+            .watch-btn {
+                width: 100%;
+                justify-content: center;
+                padding: 0.8rem 1.5rem;
+                font-size: 0.85rem;
+            }
+            
+            .footer {
+                left: 1.5rem;
+                bottom: 1rem;
+                font-size: 0.75rem;
+            }
+
+            .music-page {
+                padding: 6rem 1.5rem 2rem;
+            }
+
+            .music-title {
+                font-size: 2.5rem;
+            }
+
+            .music-subtitle {
+                font-size: 1rem;
+            }
+
+            .toggle-btn {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.8rem;
+            }
+
+            .tracks-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .timeline-line {
+                left: 2rem;
+            }
+
+            .timeline-item:nth-child(odd) .timeline-content,
+            .timeline-item:nth-child(even) .timeline-content {
+                width: calc(100% - 4rem);
+                margin-left: 4rem;
+                margin-right: 0;
+                padding: 1.5rem;
+                padding-left: 2rem;
+            }
+
+            .timeline-dot {
+                left: 2rem;
+                width: 16px;
+                height: 16px;
+            }
+
+            .timeline-track-name {
+                font-size: 1.5rem;
+            }
+
+            .timeline-date {
+                font-size: 1rem;
+            }
+
+            .track-card {
+                border-radius: 15px;
+            }
+
+            .track-image {
+                height: 200px;
+            }
+
+            .track-info {
+                padding: 1.5rem;
+            }
+
+            .track-name {
+                font-size: 1.4rem;
+            }
+
+            .spotify-section {
+                padding: 2.5rem 1.5rem;
+            }
+
+            .spotify-title {
+                font-size: 1.8rem;
+            }
+
+            .spotify-btn {
+                padding: 1rem 2rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="logo" onclick="showPage('home')">WT</div>
+        <ul class="nav-links">
+            <li><a onclick="showPage('music')">Hudba</a></li>
+         <!--   <li><a href="#about">O mně</a></li>
+            <li><a href="#contact">Kontakt</a></li> -->
+        </ul>
+    </nav>
+
+    <!-- HOME PAGE -->
+    <div class="page active" id="homePage">
+        <div class="slide active" id="slide1">
+            <div class="slide-bg" style="background-image: url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1920&q=80')"></div>
+            <div class="slide-content">
+                <div class="slide-text">
+                    <h1 class="slide-title">WILLY<br>TEA</h1>
+                    <p class="slide-subtitle">Nestandardní přístup. Jedinečný zvuk, Kombinace ingrediencí, kde zkušenost potkává nový začátek.</p>
+                </div>
+                <div class="slide-number">01</div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide2">
+            <div class="slide-bg" style="background-image: url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1920&q=80')"></div>
+            <div class="slide-content">
+                <div class="slide-text">
+                    <h1 class="slide-title">NOVÝ<br>ZAČÁTEK</h1>
+                    <p class="slide-subtitle">28. října startuje další kapitola. Tea City je první skladba ze série, která odhalí jiný pohled na hip hop.</p>
+                    <!-- Odpočet byl odstraněn z tohoto slidu -->
+                </div>
+                <div class="slide-number">02</div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide3">
+            <div class="slide-bg" style="background-image: url('https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=1920&q=80')"></div>
+            <div class="slide-content">
+                <div class="slide-text">
+                    <h1 class="slide-title">JINÝ<br>CÍLE</h1>
+                    <p class="slide-subtitle">Jde o otevírání očí, motivaci a odhodlání. Hudba jako médium pro sdílení perspektivy.</p>
+                </div>
+                <div class="slide-number">03</div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide4">
+            <div class="slide-bg" style="background-image: url('https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=1920&q=80')"></div>
+            <div class="slide-content">
+                <div class="slide-text">
+                    <h1 class="slide-title">CO<br>PŘIJDE</h1>
+                    <p class="slide-subtitle">Hip hop s podpisem producenta, který zná každý kout studia. Zde příběh nekončí, teprve začíná.</p>
+                </div>
+                <div class="slide-number">04</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="nav-buttons">
+                <button class="nav-btn" id="prevBtn">ZPĚT</button>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <button class="nav-btn" id="nextBtn">DALŠÍ</button>
+            </div>
+            <a href="https://distrokid.com/hyperfollow/willytea/tea-city" target="_blank"><button class="watch-btn">
+                <div class="play-icon"></div>
+                POSLECHNI TEA CITY
+            </button></a>
+        </div>  
+
+     <!--   <div class="footer">© 2024 WILLY TEA</div> -->
+    </div>
+
+    <!-- MUSIC PAGE -->
+    <div class="page" id="musicPage">
+        <div class="music-page">
+            <div class="music-container">
+                <div class="music-header">
+                    <h1 class="music-title">HUDBA</h1>
+                    <p class="music-subtitle">Co už vyšlo a co teprve přijde</p>
+                    
+                    <!-- Odpočet přidán zde pod nadpis Hudba -->
+                    <div class="countdown-container" style="margin: 3rem auto; max-width: 600px;">
+                        <div class="countdown-title">NOVÁ SKLADBA VYCHÁZÍ ZA:</div>
+                        <div class="countdown" id="musicCountdown">
+                            <div class="countdown-item">
+                                <span class="countdown-value" id="musicDays">00</span>
+                                <span class="countdown-label">DNÍ</span>
+                            </div>
+                            <div class="countdown-item">
+                                <span class="countdown-value" id="musicHours">00</span>
+                                <span class="countdown-label">HODIN</span>
+                            </div>
+                            <div class="countdown-item">
+                                <span class="countdown-value" id="musicMinutes">00</span>
+                                <span class="countdown-label">MINUT</span>
+                            </div>
+                            <div class="countdown-item">
+                                <span class="countdown-value" id="musicSeconds">00</span>
+                                <span class="countdown-label">SEKUND</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="view-toggle">
+                        <button class="toggle-btn active" onclick="switchView('released')">VYDÁNO</button>
+                        <button class="toggle-btn" onclick="switchView('timeline')">TIMELINE</button>
+                    </div>
+                </div>
+
+                <!-- RELEASED VIEW -->
+                <div class="view-section active" id="releasedView">
+                    <div class="tracks-grid">
+                        <!-- HOLLYWOOD -->
+                        <div class="track-card">
+                            <div class="track-image-container">
+                                <img src="C:\Users\rick\Documents\GitHub\MY_WEBSITES\WillyTea\hollywood.jpeg" alt="Hollywood" class="track-image">
+                                <span class="track-status status-released">VENKU</span>
+                            </div>
+                            <div class="track-info">
+                                <h3 class="track-name">HOLLYWOOD</h3>
+                                <p class="track-date">2024 • Singl</p>
+                                <p class="track-description">Uděláme si to tu. Uděláme si tu Hollywood!</p>
+                                <div class="track-links">
+                                    <a href="https://open.spotify.com/artist/7Jt7WtDRfbICDGKrzakY2y" target="_blank" class="track-link">SPOTIFY</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- NEVOLEJ -->
+                        <div class="track-card" >
+                            <div class="track-image-container">
+                                <img src="C:\Users\rick\Documents\GitHub\MY_WEBSITES\WillyTea\nevolej.jpg" alt="Nevolej" class="track-image">
+                                <span class="track-status status-released">VENKU</span>
+                            </div>
+                            <div class="track-info">
+                                <h3 class="track-name">NEVOLEJ</h3>
+                                <p class="track-date">2024 • Singl</p>
+                                <p class="track-description">Jestli se nudíš, nevolej mi. Volej kámošům na mobilu.</p>
+                                <div class="track-links">
+                                    <a href="https://open.spotify.com/artist/7Jt7WtDRfbICDGKrzakY2y" target="_blank" class="track-link">SPOTIFY</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- MOJE KRŮ -->
+                        <div class="track-card">  <!-- <onclick="window.open('#')"> funkce na otevření okna -->
+                            <div class="track-image-container">
+                                <img src="C:\Users\rick\Documents\GitHub\MY_WEBSITES\WillyTea\moje-kru.jpg" alt="Moje Krů" class="track-image">
+                                <span class="track-status status-released">VENKU</span>
+                            </div>
+                            <div class="track-info">
+                                <h3 class="track-name">MOJE KRŮ</h3>
+                                <p class="track-date">2024 • Singl</p>
+                                <p class="track-description">Máme spoustu kladů i záporů, ale jsme v tom spolu.</p>
+                                <div class="track-links">
+                                    <a href="https://open.spotify.com/artist/7Jt7WtDRfbICDGKrzakY2y" target="_blank" class="track-link">SPOTIFY</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TIMELINE VIEW -->
+                <div class="view-section" id="timelineView">
+                    <div class="timeline-container">
+                        <div class="timeline-line"></div>
+                        
+                        <!-- Moje Krů -->
+                        <div class="timeline-item">
+                            <div class="timeline-dot released"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-date">2024</div>
+                                <h3 class="timeline-track-name">MOJE KRŮ</h3>
+                                <p class="timeline-description">Jsme dokonalej tým, stoupáme nahoru.</p>
+                                <span class="timeline-status status-released">VYDÁNO</span>
+                            </div>
+                        </div>
+
+                        <!-- Hollywood -->
+                        <div class="timeline-item">
+                            <div class="timeline-dot released"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-date">2024</div>
+                                <h3 class="timeline-track-name">HOLLYWOOD</h3>
+                                <p class="timeline-description">Melodický rap. Uděláme si tu Hollywood!</p>
+                                <span class="timeline-status status-released">VYDÁNO</span>
+                            </div>
+                        </div>
+	
+                        <!-- Nevolej -->
+                        <div class="timeline-item">
+                            <div class="timeline-dot released"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-date">2024</div>
+                                <h3 class="timeline-track-name">NEVOLEJ</h3>
+                                <p class="timeline-description">Nudíš se? Volej kámošům. Mě nech ve studiu.</p>
+                                <span class="timeline-status status-released">VYDÁNO</span>
+                            </div>
+                        </div>
+
+                        <!-- Tea City -->
+                        <div class="timeline-item">
+                            <div class="timeline-dot upcoming"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-date">28. ŘÍJNA 2025</div>
+                                <h3 class="timeline-track-name">TEA CITY</h3>
+                                <p class="timeline-description">Skladba z nové série. Odhalí jiný pohled na rap.</p>
+                                <span class="timeline-status status-soon">JIŽ BRZY</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="spotify-section">
+                    <h2 class="spotify-title">POSLOUCHEJ NA SPOTIFY</h2>
+                    <p class="spotify-subtitle">Všechny skladby na jednom místě</p>
+                    <a href="https://open.spotify.com/artist/7Jt7WtDRfbICDGKrzakY2y" target="_blank" class="spotify-btn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-2-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+                        </svg>
+                        SPOTIFY
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript zůstává stejný, pouze přidáme nový odpočet pro hudební stránku
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        // Funkce pro odpočet na hudební stránce
+        function updateMusicCountdown() {
+            const targetDate = new Date('October 28, 2025 00:00:00').getTime();
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById('musicDays').textContent = days.toString().padStart(2, '0');
+            document.getElementById('musicHours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('musicMinutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('musicSeconds').textContent = seconds.toString().padStart(2, '0');
+        }
+
+        // Spustit odpočet pro hudební stránku
+        setInterval(updateMusicCountdown, 1000);
+        updateMusicCountdown(); // Okamžitá inicializace
+
+        // Zbytek JavaScriptu zůstává stejný
+        function showSlide(index) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[index].classList.add('active');
+            currentSlide = index;
+            updateProgress();
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            showSlide(currentSlide);
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            showSlide(currentSlide);
+        }
+
+        function updateProgress() {
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId + 'Page').classList.add('active');
+            
+            if (pageId === 'home') {
+                showSlide(0);
+            }
+        }
+
+        function switchView(view) {
+            document.querySelectorAll('.view-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(view + 'View').classList.add('active');
+            
+            document.querySelectorAll('.toggle-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        document.getElementById('nextBtn').addEventListener('click', nextSlide);
+        document.getElementById('prevBtn').addEventListener('click', prevSlide);
+
+        // Auto-slide každých 10 sekund
+        setInterval(nextSlide, 10000);
+
+        // Parallax efekt
+        document.querySelectorAll('.slide').forEach(slide => {
+            slide.addEventListener('mousemove', (e) => {
+                const bg = slide.querySelector('.slide-bg');
+                const x = e.clientX / window.innerWidth;
+                const y = e.clientY / window.innerHeight;
+                bg.style.transform = `scale(1.05) translate(${x * 20}px, ${y * 20}px)`;
+            });
+        });
+
+        // Inicializace
+        updateProgress();
+    </script>
+</body>
+</html>
